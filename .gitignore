@@ -1,0 +1,14 @@
+.DS_STORE
+*.log
+
+node_modules
+
+dist
+tests/test_result.xml
+
+build.json
+package-lock.json
+
+.cache-loader
+
+support_dist

@@ -6,7 +6,6 @@ import Demo from './Customer/Demo'
 import elasticlunr from 'elasticlunr';
 import {data} from './Customer/data'
 import _ from 'lodash';
-import ApplicationBar from './common/ApplicationBar'
 import MainView from './MainView'
 
 class Root extends React.Component {

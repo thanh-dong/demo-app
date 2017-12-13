@@ -138,7 +138,7 @@ class CustomerTable extends React.Component {
   
 
   componentDidMount() {
-    fetch('http://localhost:8088/getinsights')
+    fetch('http://comfoma.herokuapp.com/getinsights')
     .then(res => res.text())
     .then(data => this.setState({data: JSON.parse(data)}));
   }

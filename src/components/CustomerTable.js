@@ -21,6 +21,8 @@ import Tooltip from 'material-ui/Tooltip';
 import DeleteIcon from 'material-ui-icons/Delete';
 import OpenInNew from 'material-ui-icons/OpenInNew';
 import CustomerDialog from './Dialog/CustomerDialog';
+import fetch from 'node-fetch'
+
 
 let counter = 0;
 function createData(number, name, email, insights) {
@@ -113,23 +115,8 @@ class CustomerTable extends React.Component {
 
     this.state = {
       order: 'asc',
-      orderBy: 'calories',
       selected: [],
-      data: [
-        createData('+841202770828', 'Cupcake', 'email@email.com', 3.7),
-        createData('+841202770828', 'Donut', 'email@email.com', 25.0),
-        createData('+841202770828', 'Eclair', 'email@email.com', 16.0),
-        createData('+841202770828', 'Frozen yoghurt', 'email@email.com', 6.0),
-        createData('+841202770828', 'Gingerbread', 'email@email.com', 16.0),
-        createData('+841202770828', 'Honeycomb', 'email@email.com', 3.2),
-        createData('+841202770828', 'Ice cream sandwich', 'email@email.com', 9.0),
-        createData('+841202770828', 'Jelly Bean', 'email@email.com', 0.0),
-        createData('+841202770828', 'KitKat', 'email@email.com', 26.0),
-        createData('+841202770828', 'Lollipop', 'email@email.com', 0.2),
-        createData('+841202770828', 'Marshmallow', 'email@email.com', 0),
-        createData('+841202770828', 'Nougat', 'email@email.com', 19.0),
-        createData('+841202770828', 'Oreo', 'email@email.com', 18.0),
-      ].sort((a, b) => (a.calories < b.calories ? -1 : 1)),
+      data: [],
       page: 0,
       rowsPerPage: 5,
     };
@@ -149,6 +136,13 @@ class CustomerTable extends React.Component {
 
   isSelected = id => this.state.selected.indexOf(id) !== -1;
   
+
+  componentDidMount() {
+    fetch('http://localhost:8088/getinsights')
+    .then(res => res.text())
+    .then(data => this.setState({data: JSON.parse(data)}));
+  }
+
   render() { 
     const { classes } = this.props;
     const { data, order, orderBy, selected, rowsPerPage, page } = this.state;
@@ -181,7 +175,7 @@ class CustomerTable extends React.Component {
                     <TableCell padding="default">{n.number}</TableCell>
                     <TableCell padding="default">{n.name}</TableCell>
                     <TableCell padding="default">{n.email}</TableCell>
-                    <TableCell padding="default">{n.insights}</TableCell>
+                    <TableCell padding="default">{_.join(n.insights, ' - ')}</TableCell>
                     <TableCell padding="checkbox">
                       <IconButton
                         onClick={openDialog}

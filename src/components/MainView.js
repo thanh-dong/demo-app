@@ -17,7 +17,6 @@ import ChevronRightIcon from 'material-ui-icons/ChevronRight';
 import AppView from './AppView'
 import CustomerTable from './CustomerTable'
 import {Flex} from 'reflexbox'
-
 const drawerWidth = 240;
 
 const styles = theme => ({
@@ -161,7 +160,6 @@ class MainView extends React.Component {
     } else {
       after = drawer;
     }
-
     return (
       <Flex auto className={classes.root}>
         <div className={classes.appFrame}>

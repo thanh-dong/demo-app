@@ -20,6 +20,7 @@ class AppView extends React.Component {
       this.setState({ searchString: event.target.value })
       this.setState({result: this.index.search(event.target.value, {expand: true})})
     }
+    debugger;
     return (
       <Flex column auto>
         <Demo 
@@ -37,7 +38,6 @@ class AppView extends React.Component {
       this.addField('number');
       this.addField('insights');
       this.setRef('number');
-      this.saveDocument(false);
     });
     _.forEach(data, (item) => index.addDoc(item));
     return index;

@@ -9,7 +9,7 @@
     "lint": "eslint src/**",
     "lint:watch": "esw -w src/**",
     "review": "npm run lint && npm test",
-    "start": "npm run build && NODE_ENV=production babel-node server.js --presets es2015,stage-2",
+    "start": "npm run build && NODE_ENV=production ./node_modules/.bin/babel-node server.js --presets es2015,stage-2",
     "test": "jest src/**",
     "test:watch": "jest src/** --watch",
     "test:watchAll": "jest src/** --watchAll",

@@ -27,7 +27,6 @@ import { data } from './Customer/data';
 import elasticlunr from 'elasticlunr';
 import _ from 'lodash';
 
-
 let counter = 0;
 function createData(number, name, email, insights) {
   counter += 1;
@@ -133,7 +132,7 @@ class CustomerTable extends React.Component {
       },
       expand: true
     })
-    const sortedRecord = _.orderBy(_.sampleSize(matchRecord,  _.random(30, 120)), ['score'], ['desc']);
+    const sortedRecord = _.orderBy(_.sampleSize(matchRecord,  _.size(matchRecord)/3), ['score'], ['desc']);
     const foundData = _(sortedRecord).map((item) => _.find(data, {number: item.ref})).compact().value();
     console.log(foundData)
     this.dialog.open(foundData)
@@ -158,16 +157,6 @@ class CustomerTable extends React.Component {
     const { order, orderBy, selected, rowsPerPage, page } = this.state;
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
     const bindDialog = (ref) => this.dialog = ref;
-    const openDialog = (searchString) => {
-      const matchRecord = this.index.search(searchString, {
-        fields: {
-          insight_string: { boost: 2 },
-        },
-        expand: true
-      })
-      console.log(matchRecord)
-      this.dialog.open(matchRecord)
-    };
 
     return (
       <Paper className={classes.root}>

@@ -22,6 +22,9 @@ import DeleteIcon from 'material-ui-icons/Delete';
 import OpenInNew from 'material-ui-icons/OpenInNew';
 import CustomerDialog from './Dialog/CustomerDialog';
 import fetch from 'node-fetch'
+import asyncPoll from 'react-async-poll';
+import { data } from './Customer/data';
+
 
 
 let counter = 0;
@@ -36,6 +39,8 @@ const columnData = [
   { id: 'email', numeric: false, disablePadding: false, label: 'Email' },
   { id: 'insights', numeric: false, disablePadding: false, label: 'Insights' },
 ];
+
+
 
 class CustomerTableHead extends React.Component {
   static propTypes = {
@@ -112,7 +117,6 @@ const styles = theme => ({
 class CustomerTable extends React.Component {
   constructor(props, context) {
     super(props, context);
-
     this.state = {
       order: 'asc',
       selected: [],
@@ -136,20 +140,16 @@ class CustomerTable extends React.Component {
 
   isSelected = id => this.state.selected.indexOf(id) !== -1;
   
-
-  componentDidMount() {
-    fetch('http://comfoma.herokuapp.com/getinsights')
-    .then(res => res.text())
-    .then(data => this.setState({data: JSON.parse(data)}));
+  componentWillReceiveProps(nextProps) {
+    console.log(nextProps)
   }
 
   render() { 
-    const { classes } = this.props;
-    const { data, order, orderBy, selected, rowsPerPage, page } = this.state;
+    const { classes, data } = this.props;
+    const { order, orderBy, selected, rowsPerPage, page } = this.state;
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
     const bindDialog = (ref) => this.dialog = ref;
     const openDialog = () => this.dialog.open();
-
     return (
       <Paper className={classes.root}>
         <CustomerDialog ref={bindDialog}/>
@@ -214,4 +214,14 @@ CustomerTable.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(CustomerTable);
+const onPollInterval = (props, dispatch) => {
+  console.log(props);
+  console.log(dispatch);
+  return fetch('http://comfoma.herokuapp.com/getinsights')
+  .then(res => res.text())
+  .then(data => {
+    props.setData(JSON.parse(data));
+  });
+};
+
+export default withStyles(styles)(asyncPoll(10 * 1000, onPollInterval)(CustomerTable));

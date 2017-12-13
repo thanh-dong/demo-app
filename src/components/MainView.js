@@ -111,6 +111,7 @@ class MainView extends React.Component {
   state = {
     open: false,
     anchor: 'left',
+    data: []
   };
 
   handleDrawerOpen = () => {
@@ -190,13 +191,18 @@ class MainView extends React.Component {
               [classes[`contentShift-${anchor}`]]: open,
             })}
           >
-            <CustomerTable />
+            <CustomerTable 
+              data={this.state.data}
+              setData={this.setData}
+            />
           </main>
           {after}
         </div>
       </Flex>
     );
   }
+
+  setData = (data) => this.setState({data})
 }
 
 MainView.propTypes = {

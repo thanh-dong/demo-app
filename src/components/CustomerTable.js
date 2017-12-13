@@ -24,7 +24,8 @@ import CustomerDialog from './Dialog/CustomerDialog';
 import fetch from 'node-fetch'
 import asyncPoll from 'react-async-poll';
 import { data } from './Customer/data';
-
+import elasticlunr from 'elasticlunr';
+import _ from 'lodash';
 
 
 let counter = 0;
@@ -39,8 +40,6 @@ const columnData = [
   { id: 'email', numeric: false, disablePadding: false, label: 'Email' },
   { id: 'insights', numeric: false, disablePadding: false, label: 'Insights' },
 ];
-
-
 
 class CustomerTableHead extends React.Component {
   static propTypes = {
@@ -126,8 +125,18 @@ class CustomerTable extends React.Component {
     };
   }
 
-  handleClick = (event, id) => {
-    console.log(id);
+  handleClick = (event, searchString) => {
+    searchString.replace(';','*')
+    const matchRecord = this.index.search(searchString.replace(';','*'), {
+      fields: {
+        insight_string: { boost: 2 },
+      },
+      expand: true
+    })
+    const sortedRecord = _.orderBy(_.sampleSize(matchRecord,  _.random(30, 120)), ['score'], ['desc']);
+    const foundData = _(sortedRecord).map((item) => _.find(data, {number: item.ref})).compact().value();
+    console.log(foundData)
+    this.dialog.open(foundData)
   };
 
   handleChangePage = (event, page) => {
@@ -140,8 +149,8 @@ class CustomerTable extends React.Component {
 
   isSelected = id => this.state.selected.indexOf(id) !== -1;
   
-  componentWillReceiveProps(nextProps) {
-    console.log(nextProps)
+  componentDidMount() {
+    this.index = this.prepareData();
   }
 
   render() { 
@@ -149,7 +158,17 @@ class CustomerTable extends React.Component {
     const { order, orderBy, selected, rowsPerPage, page } = this.state;
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
     const bindDialog = (ref) => this.dialog = ref;
-    const openDialog = () => this.dialog.open();
+    const openDialog = (searchString) => {
+      const matchRecord = this.index.search(searchString, {
+        fields: {
+          insight_string: { boost: 2 },
+        },
+        expand: true
+      })
+      console.log(matchRecord)
+      this.dialog.open(matchRecord)
+    };
+
     return (
       <Paper className={classes.root}>
         <CustomerDialog ref={bindDialog}/>
@@ -167,7 +186,7 @@ class CustomerTable extends React.Component {
                 return (
                   <TableRow
                     hover
-                    onClick={event => this.handleClick(event, n.id)}
+                    onClick={event => this.handleClick(event, _.join(n.insights, ';'))}
                     aria-checked={isSelected}
                     tabIndex={-1}
                     key={n.id}
@@ -175,10 +194,9 @@ class CustomerTable extends React.Component {
                     <TableCell padding="default">{n.number}</TableCell>
                     <TableCell padding="default">{n.name}</TableCell>
                     <TableCell padding="default">{n.email}</TableCell>
-                    <TableCell padding="default">{_.join(n.insights, ' - ')}</TableCell>
+                    <TableCell padding="default">{_.join(n.insights, ';')}</TableCell>
                     <TableCell padding="checkbox">
                       <IconButton
-                        onClick={openDialog}
                       >
                         <OpenInNew />
                       </IconButton>
@@ -208,6 +226,19 @@ class CustomerTable extends React.Component {
       </Paper>
     );
   }
+
+  prepareData = () => {
+    const index = elasticlunr(function () {
+      this.addField('insight_string');
+      this.setRef('number');
+    });
+    _.forEach(data, (item) => {
+      const insight_string = _.join(_.map(item.insights, 'name'), ';');
+      item.insight_string = insight_string;
+      index.addDoc(item)
+    });
+    return index;
+  }
 }
 
 CustomerTable.propTypes = {
@@ -215,8 +246,6 @@ CustomerTable.propTypes = {
 };
 
 const onPollInterval = (props, dispatch) => {
-  console.log(props);
-  console.log(dispatch);
   return fetch('http://comfoma.herokuapp.com/getinsights')
   .then(res => res.text())
   .then(data => {

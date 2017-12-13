@@ -36,7 +36,7 @@ class TabView extends React.Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, data } = this.props;
     const { value } = this.state;
 
     return (
@@ -48,7 +48,9 @@ class TabView extends React.Component {
           </Tabs>
         </AppBar>
         {value === 0 && <TabContainer>
-          <InsightTable />
+          <InsightTable 
+            data={data}
+          />
         </TabContainer>}
         {value === 1 && <TabContainer>
           <Typography type="body1" component="p">

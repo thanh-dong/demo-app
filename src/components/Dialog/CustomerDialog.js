@@ -15,15 +15,15 @@ function Transition(props) {
 class CustomerDialog extends React.Component {
   state = {
     open: false,
-    customerNumber: undefined
+    matchData: []
   };
 
-  open = (customerNumber) => {
-    this.setState({ open: true, customerNumber });
+  open = (matchData) => {
+    this.setState({ open: true, matchData });
   };
 
   handleRequestClose = () => {
-    this.setState({ open: false, customerNumber: undefined });
+    this.setState({ open: false, matchData: [] });
   };
 
   render() {
@@ -37,7 +37,9 @@ class CustomerDialog extends React.Component {
         >
           <DialogTitle>{"Insight"}</DialogTitle>
           <DialogContent>
-              <TabView />
+              <TabView 
+                data={this.state.matchData}
+              />
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleRequestClose} color="primary">

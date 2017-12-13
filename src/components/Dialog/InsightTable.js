@@ -19,16 +19,10 @@ import Checkbox from 'material-ui/Checkbox';
 import IconButton from 'material-ui/IconButton';
 import Tooltip from 'material-ui/Tooltip';
 
-let counter = 0;
-function createData(number, name, email, insights) {
-  counter += 1;
-  return { id: counter, number, name, email, insights };
-}
-
 const columnData = [
   { id: 'number', numeric: false, disablePadding: false, label: 'Phone Number' },
   { id: 'email', numeric: false, disablePadding: false, label: 'Email' },
-  { id: 'insights', numeric: false, disablePadding: false, label: 'Insights' },
+  { id: 'insight_string', numeric: false, disablePadding: false, label: 'Insights' },
 ];
 
 class InsightTableHead extends React.Component {
@@ -110,29 +104,11 @@ class InsightTable extends React.Component {
       order: 'asc',
       orderBy: 'calories',
       selected: [],
-      data: [
-        createData('+841202770828', 'email@email.com', 3.7),
-        createData('+841202770828', 'email@email.com', 25.0),
-        createData('+841202770828', 'email@email.com', 16.0),
-        createData('+841202770828', 'email@email.com', 6.0),
-        createData('+841202770828', 'email@email.com', 16.0),
-        createData('+841202770828', 'email@email.com', 3.2),
-        createData('+841202770828', 'email@email.com', 9.0),
-        createData('+841202770828', 'email@email.com', 0.0),
-        createData('+841202770828', 'email@email.com', 26.0),
-        createData('+841202770828', 'email@email.com', 0.2),
-        createData('+841202770828', 'email@email.com', 0),
-        createData('+841202770828', 'email@email.com', 19.0),
-        createData('+841202770828', 'email@email.com', 18.0),
-      ].sort((a, b) => (a.calories < b.calories ? -1 : 1)),
+      data: props.data,
       page: 0,
       rowsPerPage: 5,
     };
   }
-
-  handleClick = (event, id) => {
-    console.log(id);
-  };
 
   handleChangePage = (event, page) => {
     this.setState({ page });
@@ -142,12 +118,11 @@ class InsightTable extends React.Component {
     this.setState({ rowsPerPage: event.target.value });
   };
 
-  isSelected = id => this.state.selected.indexOf(id) !== -1;
-
   render() {
     const { classes } = this.props;
     const { data, order, orderBy, selected, rowsPerPage, page } = this.state;
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
+    console.log(data)
     return (
       <Paper className={classes.root}>
         <div className={classes.tableWrapper}>
@@ -160,18 +135,15 @@ class InsightTable extends React.Component {
             />
             <TableBody>
               {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(n => {
-                const isSelected = this.isSelected(n.id);
                 return (
                   <TableRow
                     hover
-                    onClick={event => this.handleClick(event, n.id)}
-                    aria-checked={isSelected}
                     tabIndex={-1}
                     key={n.id}
                   >
                     <TableCell padding="default">{n.number}</TableCell>
                     <TableCell padding="default">{n.email}</TableCell>
-                    <TableCell padding="default">{n.insights}</TableCell>
+                    <TableCell padding="default">{n.insight_string}</TableCell>
                   </TableRow>
                 );
               })}
